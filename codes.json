@@ -1,0 +1,25 @@
+{
+  "codes": {
+    "code1": {
+      "code": "POWEROFFOOTBALL",
+      "reward": "Special Reward",
+      "status": "ACTIVE",
+      "source": "Demo Source",
+      "published": "15 Aug 2026"
+    },
+    "code2": {
+      "code": "WELCOMEFCM",
+      "reward": "Coins + Pack",
+      "status": "ACTIVE",
+      "source": "Demo Source",
+      "published": "14 Aug 2026"
+    },
+    "code3": {
+      "code": "OLDCODE2026",
+      "reward": "Player Pack",
+      "status": "EXPIRED",
+      "source": "Demo Source",
+      "published": "01 Aug 2026"
+    }
+  }
+}

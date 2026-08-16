@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FCM Redeem Code</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<div id="notification" class="notification">
+    <div class="notification-icon">🔔</div>
+
+    <div class="notification-content">
+        <strong>New Redeem Code Found</strong>
+        <span id="notificationCode"></span>
+    </div>
+
+    <button onclick="closeNotification()">×</button>
+</div>
+<body>
+
+<header>
+    <button
+        id="themeButton"
+        onclick="toggleTheme()"
+        style="
+            position:absolute;
+            right:15px;
+            top:15px;
+            border:0;
+            border-radius:10px;
+            padding:9px 11px;
+            background:#202d3c;
+            color:white;
+            font-size:17px;
+        "
+    >☀️</button>
+
+    <h1>FCM REDEEM CODE</h1>
+    <p>FC Mobile Redeem Codes</p>
+</header>
+
+<main>
+
+    <section>
+        <h2>🔴 LIVE CODES</h2>
+
+        <div class="tools">
+            <input
+                type="text"
+                id="searchBox"
+                placeholder="🔍 Search redeem code..."
+                oninput="searchCodes()"
+            >
+
+            <button onclick="loadCodes()">🔄 Refresh</button>
+        </div>
+
+        <p id="lastUpdated">Loading codes...</p>
+
+        <div id="codesContainer">
+            <p>⏳ Loading...</p>
+        </div>
+
+        <h2 class="expired-title">🔴 EXPIRED CODES</h2>
+
+        <div id="expiredContainer">
+            <p>⏳ Loading...</p>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>FCM Redeem Code © 2026</p>
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAh8U9sNdCRPT0ECzfoza2wt1hXpIjRQ_M",
+    authDomain: "fcm-redeem-code.firebaseapp.com",
+    databaseURL: "https://fcm-redeem-code-default-rtdb.firebaseio.com",
+    projectId: "fcm-redeem-code",
+    storageBucket: "fcm-redeem-code.firebasestorage.app",
+    messagingSenderId: "377844661842",
+    appId: "1:377844661842:web:e08f3031199f399706a98b",
+    measurementId: "G-NRK1MNTFDS"
+};
+
+firebase.initializeApp(firebaseConfig);
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
