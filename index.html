@@ -1,16 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>FCM Redeem Code</title>
+<title>FC Mobile Redeem Codes</title>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+.creator {
+    margin-top: 6px;
+    color: #8c35ff;
+    font-size: 13px;
+    font-weight: bold;
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #0b0713;
+    --card: #181225;
+    --card2: #21182f;
+    --text: #ffffff;
+    --muted: #a99fb8;
+    --pink: #ff20d9;
+    --purple: #8c35ff;
+    --green: #00ff66;
+    --red: #ff304f;
+    --blue: #2784ff;
+    --border: rgba(255,255,255,0.08);
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 50% -10%, #30134d 0%, transparent 40%),
+        var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    padding: 25px 18px 28px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+header h1 span {
+    background: linear-gradient(90deg, #ffffff, var(--pink));
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+header p {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+#themeButton {
+    position: absolute;
+    right: 15px;
+    top: 18px;
+    width: 45px;
+    height: 45px;
+    border: 0;
+    border-radius: 14px;
+    background: #202d3c;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* LIVE STATUS */
+.live-status {
+    margin: 30px auto 25px;
+    width: fit-content;
+    padding: 12px 22px;
+    border-radius: 30px;
+    background: rgba(255,40,70,0.10);
+    border: 1px solid rgba(255,40,70,0.25);
+    color: #ff6376;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(255,40,70,0.10);
+}
+
+.live-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: #ff304f;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 12px #ff304f;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 20px 15px 35px;
+}
+
+.hero h2 {
+    font-size: 45px;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 1.05;
+}
+
+.hero h2 span {
+    display: block;
+    margin-top: 5px;
+    background: linear-gradient(90deg, #ff20d9, #9c25ff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    color: #aaa1b2;
+    margin-top: 18px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* MAIN */
+main {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+    padding: 0 18px 50px;
+}
+
+.section-title {
+    font-size: 27px;
+    margin: 20px 0;
+    font-weight: 900;
+    border-left: 6px solid var(--green);
+    padding-left: 12px;
+}
+
+/* TOOLS */
+.tools {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+#searchBox {
+    flex: 1;
+    min-width: 0;
+    padding: 17px;
+    border-radius: 17px;
+    border: 1px solid var(--border);
+    background: #111a25;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+#searchBox:focus {
+    border-color: var(--purple);
+}
+
+.refresh-btn {
+    border: 0;
+    border-radius: 17px;
+    padding: 0 20px;
+    background: var(--blue);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#lastUpdated {
+    color: #8f9aaa;
+    margin: 12px 3px 20px;
+    font-size: 14px;
+}
+
+/* CODE CARD */
+.code-card {
+    position: relative;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,0.025), transparent),
+        var(--card);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    padding: 25px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.code-card.hot {
+    border-color: rgba(255,30,60,0.25);
+}
+
+.hot-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--red);
+    padding: 10px 18px;
+    border-radius: 0 22px 0 20px;
+    font-weight: 900;
+}
+
+.status {
+    color: var(--green);
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.code {
+    background: var(--card2);
+    border-radius: 17px;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    word-break: break-word;
+    margin: 10px 0 18px;
+}
+
+.info {
+    color: #aaa3b1;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.info strong {
+    color: #ffffff;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.copy-btn,
+.redeem-btn {
+    flex: 1;
+    padding: 17px;
+    border: 0;
+    border-radius: 16px;
+    color: white;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.copy-btn {
+    background: #202d3d;
+}
+
+.redeem-btn {
+    background: var(--blue);
+}
+
+.copy-btn:active,
+.redeem-btn:active,
+.refresh-btn:active {
+    transform: scale(0.97);
+}
+
+/* EXPIRED */
+.expired-title {
+    margin-top: 45px;
+    border-left: 6px solid var(--red);
+}
+
+/* NOTIFICATION */
+.notification {
+    position: fixed;
+    top: 18px;
+    left: 15px;
+    right: 15px;
+    max-width: 500px;
+    margin: auto;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: #21182f;
+    border: 1px solid #753cff;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.notification-icon {
+    font-size: 28px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content strong {
+    display: block;
+    color: white;
+}
+
+.notification-content span {
+    display: block;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.notification button {
+    background: transparent;
+    border: 0;
+    color: white;
+    font-size: 25px;
+}
+
+/* EMPTY */
+.empty {
+    padding: 30px;
+    text-align: center;
+    color: #999;
+    background: var(--card);
+    border-radius: 18px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #777;
+    border-top: 1px solid var(--border);
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .hero h2 {
+        font-size: 39px;
+    }
+
+    .tools {
+        flex-direction: column;
+    }
+
+    .refresh-btn {
+        height: 55px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .code-card {
+        padding: 20px;
+    }
+
+    .code {
+        font-size: 19px;
+    }
+}
+body.light-mode {
+    --bg: #f3f4f8;
+    --card: #ffffff;
+    --card2: #eef0f5;
+    --text: #111111;
+    --muted: #666b75;
+    --border: rgba(0,0,0,0.10);
+}
+
+body.light-mode #searchBox {
+    background: #ffffff;
+    color: #111111;
+}
+
+body.light-mode .copy-btn {
+    background: #e3e7ee;
+    color: #111111;
+}
+
+body.light-mode .live-status {
+    background: rgba(255,40,70,0.08);
+}
+
+body.light-mode footer {
+    color: #666;
+}
+</style>
+
 </head>
 
+<body>
+
+<!-- NEW CODE NOTIFICATION -->
 <div id="notification" class="notification">
-    <div class="notification-icon">🔔</div>
+    <div class="notification-icon">🎁</div>
 
     <div class="notification-content">
         <strong>New Redeem Code Found</strong>
@@ -19,58 +418,77 @@
 
     <button onclick="closeNotification()">×</button>
 </div>
-<body>
 
+<!-- HEADER -->
 <header>
-    <button
-        id="themeButton"
-        onclick="toggleTheme()"
-        style="
-            position:absolute;
-            right:15px;
-            top:15px;
-            border:0;
-            border-radius:10px;
-            padding:9px 11px;
-            background:#202d3c;
-            color:white;
-            font-size:17px;
-        "
-    >☀️</button>
 
-    <h1>FCM REDEEM CODE</h1>
-    <p>FC Mobile Redeem Codes</p>
+    <button id="themeButton" onclick="toggleTheme()">☀️</button>
+
+<h1>FCM REDEEM CODE</h1>
+<p>FC Mobile Redeem Codes</p>
+<p class="creator">Created &amp; Maintained By Shifat.</p>
+
 </header>
+
+<!-- LIVE STATUS -->
+<div class="live-status">
+    <span class="live-dot"></span>
+    LIVE STATUS: CONTINUOUSLY CHECKED
+</div>
+
+<!-- HERO -->
+<section class="hero">
+
+    <h2>
+        FC MOBILE
+        <span>REDEEM CODES</span>
+    </h2>
+
+    <p>
+        Updated regularly. Claim your free rewards,
+        FC Points, gems, coins and player packs.
+    </p>
+
+</section>
 
 <main>
 
-    <section>
-        <h2>🔴 LIVE CODES</h2>
+    <!-- ACTIVE -->
+    <h2 class="section-title">
+        ACTIVE CODES <small style="background:white;color:black;padding:5px 9px;border-radius:10px;font-size:13px;">LIVE</small>
+    </h2>
 
-        <div class="tools">
-            <input
-                type="text"
-                id="searchBox"
-                placeholder="🔍 Search redeem code..."
-                oninput="searchCodes()"
-            >
+    <div class="tools">
 
-            <button onclick="loadCodes()">🔄 Refresh</button>
-        </div>
+        <input
+            type="text"
+            id="searchBox"
+            placeholder="🔍 Search redeem code..."
+            oninput="searchCodes()"
+        >
 
-        <p id="lastUpdated">Loading codes...</p>
+        <button class="refresh-btn" onclick="loadCodes()">
+            🔄 Refresh
+        </button>
 
-        <div id="codesContainer">
-            <p>⏳ Loading...</p>
-        </div>
+    </div>
 
-        <h2 class="expired-title">🔴 EXPIRED CODES</h2>
+    <p id="lastUpdated">
+        🟢 Live • Loading...
+    </p>
 
-        <div id="expiredContainer">
-            <p>⏳ Loading...</p>
-        </div>
+    <div id="codesContainer">
+        <div class="empty">⏳ Loading codes...</div>
+    </div>
 
-    </section>
+    <!-- EXPIRED -->
+    <h2 class="section-title expired-title">
+        EXPIRED CODES
+    </h2>
+
+    <div id="expiredContainer">
+        <div class="empty">⏳ Loading...</div>
+    </div>
 
 </main>
 
@@ -78,11 +496,13 @@
     <p>FCM Redeem Code © 2026</p>
 </footer>
 
-<!-- Firebase -->
+
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
+
 const firebaseConfig = {
     apiKey: "AIzaSyAh8U9sNdCRPT0ECzfoza2wt1hXpIjRQ_M",
     authDomain: "fcm-redeem-code.firebaseapp.com",
@@ -95,9 +515,341 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-</script>
 
-<script src="script.js"></script>
+const database = firebase.database();
+
+let allCodes = [];
+
+
+/* LOAD CODES */
+
+function loadCodes() {
+
+    const activeBox = document.getElementById("codesContainer");
+    const expiredBox = document.getElementById("expiredContainer");
+
+    activeBox.innerHTML =
+        '<div class="empty">⏳ Loading codes...</div>';
+
+    database.ref("codes").once("value")
+    .then(snapshot => {
+
+        const data = snapshot.val();
+
+        if (!data) {
+
+            activeBox.innerHTML =
+                '<div class="empty">No codes found.</div>';
+
+            expiredBox.innerHTML =
+                '<div class="empty">No expired codes.</div>';
+
+            return;
+        }
+
+        allCodes = [];
+
+        Object.keys(data).forEach(key => {
+
+            const item = data[key];
+
+            if (!item || typeof item !== "object") return;
+
+            allCodes.push({
+                id: key,
+                code: item.code || key,
+                reward: item.reward || "Special Reward",
+                status: item.status || "ACTIVE",
+                source: item.source || "Unknown Source",
+                published: item.published || "Unknown Date"
+            });
+
+        });
+
+        renderCodes(allCodes);
+
+        document.getElementById("lastUpdated").innerHTML =
+            "🟢 Live • Updated: " +
+            new Date().toLocaleTimeString();
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        activeBox.innerHTML =
+            '<div class="empty">❌ Failed to load codes</div>';
+
+        expiredBox.innerHTML =
+            '<div class="empty">Unable to load expired codes.</div>';
+
+    });
+}
+
+
+/* RENDER */
+
+function renderCodes(codes) {
+
+    const activeBox =
+        document.getElementById("codesContainer");
+
+    const expiredBox =
+        document.getElementById("expiredContainer");
+
+    activeBox.innerHTML = "";
+    expiredBox.innerHTML = "";
+
+    const active = codes.filter(item =>
+        String(item.status).toUpperCase() === "ACTIVE"
+    );
+
+    const expired = codes.filter(item =>
+        String(item.status).toUpperCase() !== "ACTIVE"
+    );
+
+
+    /* ACTIVE */
+
+    if (active.length === 0) {
+
+        activeBox.innerHTML =
+            '<div class="empty">No active codes available.</div>';
+
+    } else {
+
+        active.forEach((item, index) => {
+
+            activeBox.innerHTML += createCard(
+                item,
+                index === 0,
+                false
+            );
+
+        });
+
+    }
+
+
+    /* EXPIRED */
+
+    if (expired.length === 0) {
+
+        expiredBox.innerHTML =
+            '<div class="empty">No expired codes.</div>';
+
+    } else {
+
+        expired.forEach(item => {
+
+            expiredBox.innerHTML += createCard(
+                item,
+                false,
+                true
+            );
+
+        });
+
+    }
+
+}
+
+
+/* CARD */
+
+function createCard(item, hot, expired) {
+
+    const safeCode =
+        String(item.code)
+        .replace(/'/g, "\\'");
+
+    return `
+
+        <div class="code-card ${hot ? "hot" : ""}">
+
+            ${hot && !expired
+                ? '<div class="hot-badge">HOT 🔥</div>'
+                : ''
+            }
+
+            <div class="status">
+                ${expired ? "🔴 EXPIRED" : "🟢 ACTIVE"}
+            </div>
+
+            <div class="code">
+                ${escapeHTML(item.code)}
+            </div>
+
+            <div class="info">
+                🎁 Reward:
+                <strong>${escapeHTML(item.reward)}</strong>
+            </div>
+
+            <div class="info">
+                🌐 Source:
+                <strong>${escapeHTML(item.source)}</strong>
+            </div>
+
+            <div class="info">
+                🕐 Published:
+                <strong>${escapeHTML(item.published)}</strong>
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    class="copy-btn"
+                    onclick="copyCode('${safeCode}')"
+                >
+                    📋 COPY
+                </button>
+
+                ${
+                    !expired
+                    ?
+                    `
+                    <button
+                        class="redeem-btn"
+                        onclick="redeemCode()"
+                    >
+                        🔗 REDEEM
+                    </button>
+                    `
+                    :
+                    ''
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* COPY */
+
+function copyCode(code) {
+
+    navigator.clipboard.writeText(code)
+    .then(() => {
+
+        alert("✅ Code copied: " + code);
+
+    })
+    .catch(() => {
+
+        alert("Copy failed. Please copy manually.");
+
+    });
+
+}
+
+
+/* REDEEM */
+
+function redeemCode() {
+
+    window.open(
+        "https://redeem.fcm.ea.com/",
+        "_blank"
+    );
+
+}
+
+
+/* SEARCH */
+
+function searchCodes() {
+
+    const query =
+        document.getElementById("searchBox")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const filtered = allCodes.filter(item =>
+
+        String(item.code)
+        .toLowerCase()
+        .includes(query)
+
+    );
+
+    renderCodes(filtered);
+
+}
+
+
+/* NOTIFICATION */
+
+function showNotification(code) {
+
+    document.getElementById("notificationCode")
+        .textContent = code;
+
+    document.getElementById("notification")
+        .style.display = "flex";
+
+    setTimeout(() => {
+
+        closeNotification();
+
+    }, 6000);
+
+}
+
+
+function closeNotification() {
+
+    document.getElementById("notification")
+        .style.display = "none";
+
+}
+
+
+/* THEME */
+
+function toggleTheme() {
+
+    const body = document.body;
+    const button = document.getElementById("themeButton");
+
+    if (body.classList.contains("light-mode")) {
+
+        // LIGHT → DARK
+        body.classList.remove("light-mode");
+
+        button.textContent = "☀️";
+
+    } else {
+
+        // DARK → LIGHT
+        body.classList.add("light-mode");
+
+        button.textContent = "🌙";
+    }
+}
+
+
+/* SECURITY / TEXT */
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* START */
+
+loadCodes();
+
+</script>
 
 </body>
 </html>
