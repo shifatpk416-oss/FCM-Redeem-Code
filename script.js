@@ -72,12 +72,12 @@ function displayCodes(codes) {
 
             <p>
                 🌐 Source:
-                ${escapeHTML(item.source || "Unknown")}
+                ${escapeHTML(item.source || item.Source || "Unknown Source")}
             </p>
 
             <p>
                 🕐 Published:
-                ${escapeHTML(item.published || "Unknown")}
+                ${escapeHTML(item.published || item.Published || item.Launched || "Unknown Date")}
             </p>
 
             ${
