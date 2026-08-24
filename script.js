@@ -8,9 +8,11 @@ let previousCodes = null;
 
 function isCodeExpired(item) {
 
-    // expiresAt না থাকলে status অনুযায়ী কাজ করবে
-    if (!item.expiresAt) {
-        return String(item.status || "").toUpperCase() !== "ACTIVE";
+    if (!item || !item.expiresAt) {
+
+        return String(item?.status || "")
+            .toUpperCase() !== "ACTIVE";
+
     }
 
     return Date.now() >= Number(item.expiresAt);
@@ -18,12 +20,13 @@ function isCodeExpired(item) {
 
 
 /* ================================
-   FIREBASE থেকে LIVE DATA
+   FIREBASE LIVE DATA
 ================================ */
 
 function listenForCodes() {
 
-    const codesRef = firebase.database().ref("codes");
+    const codesRef =
+        firebase.database().ref("codes");
 
     codesRef.on("value", (snapshot) => {
 
@@ -31,25 +34,48 @@ function listenForCodes() {
 
         displayCodes(allCodes);
 
-        document.getElementById("lastUpdated").innerText =
-            "🟢 Live • Updated: " +
-            new Date().toLocaleTimeString();
+        const lastUpdated =
+            document.getElementById("lastUpdated");
+
+        if (lastUpdated) {
+
+            lastUpdated.innerText =
+                "🟢 Live • Updated: " +
+                new Date().toLocaleTimeString();
+
+        }
 
     }, (error) => {
 
         console.error(error);
 
-        document.getElementById("codesContainer").innerHTML =
-            "<p>❌ Failed to load codes</p>";
+        const container =
+            document.getElementById("codesContainer");
 
-        document.getElementById("lastUpdated").innerText =
-            "🔴 Database connection failed";
+        if (container) {
+
+            container.innerHTML =
+                "<p>❌ Failed to load codes</p>";
+
+        }
+
+        const lastUpdated =
+            document.getElementById("lastUpdated");
+
+        if (lastUpdated) {
+
+            lastUpdated.innerText =
+                "🔴 Database connection failed";
+
+        }
+
     });
+
 }
 
 
 /* ================================
-   CODES দেখানো
+   DISPLAY CODES
 ================================ */
 
 function displayCodes(codes) {
@@ -60,26 +86,30 @@ function displayCodes(codes) {
     const expiredContainer =
         document.getElementById("expiredContainer");
 
+    if (!container || !expiredContainer) {
+        return;
+    }
+
     container.innerHTML = "";
     expiredContainer.innerHTML = "";
 
     let activeCount = 0;
     let expiredCount = 0;
 
-    Object.values(codes).forEach(item => {
 
-        if (!item || !item.code) return;
+    Object.values(codes || {}).forEach(item => {
+
+        if (!item || !item.code) {
+            return;
+        }
 
 
-        /* EXPIRY CHECK */
-
-        const expired = isCodeExpired(item);
+        const expired =
+            isCodeExpired(item);
 
         const status =
             expired ? "EXPIRED" : "ACTIVE";
 
-
-        /* CARD */
 
         const card =
             document.createElement("div");
@@ -87,119 +117,147 @@ function displayCodes(codes) {
         card.className = "code-card";
 
 
-        card.innerHTML = `
+        /* ================================
+           CARD CONTENT
+        ================================ */
 
-            <h3>
-                ${escapeHTML(item.code)}
-            </h3>
+        const title =
+            document.createElement("h3");
 
-
-            <p>
-                🎁 Reward:
-                ${escapeHTML(item.reward || "Unknown")}
-            </p>
+        title.textContent =
+            item.code;
 
 
-            <p>
+        const reward =
+            document.createElement("p");
 
-                ${
-                    status === "ACTIVE"
-
-                    ? '<span class="active">🟢 ACTIVE</span>'
-
-                    : '<span class="expired-text">🔴 EXPIRED</span>'
-                }
-
-            </p>
+        reward.innerHTML =
+            "🎁 Reward: " +
+            escapeHTML(
+                item.reward || "Unknown"
+            );
 
 
-            <p>
+        const statusElement =
+            document.createElement("p");
 
-                🌐 Source:
-                ${escapeHTML(
-                    item.source ||
-                    item.Source ||
-                    "Unknown Source"
-                )}
-
-            </p>
+        statusElement.innerHTML =
+            status === "ACTIVE"
+            ? '<span class="active">🟢 ACTIVE</span>'
+            : '<span class="expired-text">🔴 EXPIRED</span>';
 
 
-            <p>
+        const source =
+            document.createElement("p");
 
-                🕐 Published:
-                ${escapeHTML(
-                    item.published ||
-                    item.Published ||
-                    item.Launched ||
-                    "Unknown Date"
-                )}
-
-            </p>
-
-
-            ${
-                status === "ACTIVE"
-
-                ? `
-
-                    <div class="buttons">
-
-                        <button
-                            class="copy-code-btn"
-                            type="button">
-
-                            📋 COPY
-
-                        </button>
+        source.innerHTML =
+            "🌐 Source: " +
+            escapeHTML(
+                item.source ||
+                item.Source ||
+                "Unknown Source"
+            );
 
 
-                        <a
-                            href="https://redeem.fcm.ea.com/"
-                            target="_blank"
-                            class="redeem-button">
+        const published =
+            document.createElement("p");
 
-                            🔗 REDEEM
+        published.innerHTML =
+            "🕐 Published: " +
+            escapeHTML(
+                item.published ||
+                item.Published ||
+                item.Launched ||
+                "Unknown Date"
+            );
 
-                        </a>
 
-                    </div>
-
-                `
-
-                : ""
-            }
-
-        `;
+        card.appendChild(title);
+        card.appendChild(reward);
+        card.appendChild(statusElement);
+        card.appendChild(source);
+        card.appendChild(published);
 
 
         /* ================================
-           COPY BUTTON EVENT
+           ACTIVE BUTTONS
         ================================ */
 
         if (status === "ACTIVE") {
 
+            const buttons =
+                document.createElement("div");
+
+            buttons.className =
+                "buttons";
+
+
+            /* COPY BUTTON */
+
             const copyButton =
-                card.querySelector(".copy-code-btn");
+                document.createElement("button");
 
-            if (copyButton) {
+            copyButton.type =
+                "button";
 
-                copyButton.addEventListener(
-                    "click",
-                    () => {
+            copyButton.className =
+                "copy-code-btn";
 
-                        copyCode(item.code);
+            copyButton.textContent =
+                "📋 COPY";
 
-                    }
-                );
 
-            }
+            copyButton.addEventListener(
+                "click",
+                function () {
+
+                    copyCode(
+                        item.code,
+                        copyButton
+                    );
+
+                }
+            );
+
+
+            /* REDEEM BUTTON */
+
+            const redeemButton =
+                document.createElement("a");
+
+            redeemButton.href =
+                "https://redeem.fcm.ea.com/";
+
+            redeemButton.target =
+                "_blank";
+
+            redeemButton.rel =
+                "noopener noreferrer";
+
+            redeemButton.className =
+                "redeem-button";
+
+            redeemButton.textContent =
+                "🔗 REDEEM";
+
+
+            buttons.appendChild(
+                copyButton
+            );
+
+            buttons.appendChild(
+                redeemButton
+            );
+
+            card.appendChild(
+                buttons
+            );
 
         }
 
 
         /* ================================
-           ACTIVE
+           ADD CARD
         ================================ */
 
         if (status === "ACTIVE") {
@@ -208,14 +266,7 @@ function displayCodes(codes) {
 
             activeCount++;
 
-        }
-
-
-        /* ================================
-           EXPIRED
-        ================================ */
-
-        else {
+        } else {
 
             expiredContainer.appendChild(card);
 
@@ -226,21 +277,27 @@ function displayCodes(codes) {
     });
 
 
-    /* NO ACTIVE CODE */
+    /* ================================
+       NO ACTIVE
+    ================================ */
 
     if (activeCount === 0) {
 
         container.innerHTML =
             "<p>😔 No active codes available.</p>";
+
     }
 
 
-    /* NO EXPIRED CODE */
+    /* ================================
+       NO EXPIRED
+    ================================ */
 
     if (expiredCount === 0) {
 
         expiredContainer.innerHTML =
             "<p>No expired codes.</p>";
+
     }
 
 }
@@ -248,18 +305,34 @@ function displayCodes(codes) {
 
 /* ================================
    COPY CODE
+   Chrome + WebView
 ================================ */
 
-function copyCode(code) {
+function copyCode(code, button) {
 
-    const text = String(code);
+    const text =
+        String(code || "").trim();
 
 
-    /* MODERN COPY */
+    if (!text) {
+
+        showCopyError(
+            button
+        );
+
+        return;
+
+    }
+
+
+    /* ================================
+       CLIPBOARD API
+    ================================ */
 
     if (
         navigator.clipboard &&
-        window.isSecureContext
+        typeof navigator.clipboard.writeText ===
+        "function"
     ) {
 
         navigator.clipboard
@@ -267,28 +340,34 @@ function copyCode(code) {
 
             .then(() => {
 
-                alert(
-                    "✅ Code copied!\n\n" +
-                    text
+                showCopySuccess(
+                    button
                 );
 
             })
 
             .catch(() => {
 
-                fallbackCopy(text);
+                fallbackCopy(
+                    text,
+                    button
+                );
 
             });
 
-    }
-
-    /* FALLBACK COPY */
-
-    else {
-
-        fallbackCopy(text);
+        return;
 
     }
+
+
+    /* ================================
+       FALLBACK
+    ================================ */
+
+    fallbackCopy(
+        text,
+        button
+    );
 
 }
 
@@ -297,19 +376,39 @@ function copyCode(code) {
    FALLBACK COPY
 ================================ */
 
-function fallbackCopy(text) {
+function fallbackCopy(text, button) {
 
     const textarea =
         document.createElement("textarea");
 
 
-    textarea.value = text;
+    textarea.value =
+        text;
+
+
+    textarea.setAttribute(
+        "readonly",
+        ""
+    );
+
 
     textarea.style.position =
         "fixed";
 
     textarea.style.left =
         "-9999px";
+
+    textarea.style.top =
+        "0";
+
+    textarea.style.width =
+        "1px";
+
+    textarea.style.height =
+        "1px";
+
+    textarea.style.opacity =
+        "0";
 
 
     document.body.appendChild(
@@ -322,23 +421,23 @@ function fallbackCopy(text) {
     textarea.select();
 
 
+    let success =
+        false;
+
+
     try {
 
-        document.execCommand(
-            "copy"
-        );
-
-        alert(
-            "✅ Code copied!\n\n" +
-            text
-        );
+        success =
+            document.execCommand(
+                "copy"
+            );
 
     }
 
     catch (error) {
 
-        alert(
-            "❌ Code copy করা যায়নি"
+        console.error(
+            error
         );
 
     }
@@ -347,6 +446,86 @@ function fallbackCopy(text) {
     document.body.removeChild(
         textarea
     );
+
+
+    if (success) {
+
+        showCopySuccess(
+            button
+        );
+
+    } else {
+
+        showCopyError(
+            button
+        );
+
+    }
+
+}
+
+
+/* ================================
+   COPY SUCCESS
+================================ */
+
+function showCopySuccess(button) {
+
+    if (!button) {
+        return;
+    }
+
+
+    const oldText =
+        button.textContent;
+
+
+    button.textContent =
+        "✅ COPIED!";
+
+
+    button.disabled =
+        true;
+
+
+    setTimeout(() => {
+
+        button.textContent =
+            oldText;
+
+        button.disabled =
+            false;
+
+    }, 1500);
+
+}
+
+
+/* ================================
+   COPY ERROR
+================================ */
+
+function showCopyError(button) {
+
+    if (!button) {
+        return;
+    }
+
+
+    const oldText =
+        button.textContent;
+
+
+    button.textContent =
+        "❌ FAILED";
+
+
+    setTimeout(() => {
+
+        button.textContent =
+            oldText;
+
+    }, 1500);
 
 }
 
@@ -357,10 +536,18 @@ function fallbackCopy(text) {
 
 function searchCodes() {
 
+    const searchBox =
+        document.getElementById(
+            "searchBox"
+        );
+
+    if (!searchBox) {
+        return;
+    }
+
+
     const search =
-        document
-            .getElementById("searchBox")
-            .value
+        searchBox.value
             .toLowerCase()
             .trim();
 
@@ -368,35 +555,47 @@ function searchCodes() {
     const filtered = {};
 
 
-    Object.keys(allCodes).forEach(key => {
+    Object.keys(allCodes || {})
+        .forEach(key => {
 
-        const item =
-            allCodes[key];
+            const item =
+                allCodes[key];
 
-
-        const text = `
-
-            ${item.code || ""}
-
-            ${item.reward || ""}
-
-            ${item.status || ""}
-
-            ${item.source || ""}
-
-        `.toLowerCase();
+            if (!item) {
+                return;
+            }
 
 
-        if (text.includes(search)) {
+            const text = `
 
-            filtered[key] = item;
+                ${item.code || ""}
 
-        }
+                ${item.reward || ""}
 
-    });
+                ${item.status || ""}
+
+                ${item.source || ""}
+
+                ${item.published || ""}
+
+            `.toLowerCase();
 
 
-    displayCodes(filtered);
+            if (
+                text.includes(search)
+            ) {
+
+                filtered[key] =
+                    item;
+
+            }
+
+        });
+
+
+    displayCodes(
+        filtered
+    );
 
 }
 
@@ -417,47 +616,65 @@ function loadCodes() {
                 snapshot.val() || {};
 
 
-            if (previousCodes !== null) {
+            if (
+                previousCodes !== null
+            ) {
 
-                Object.keys(newCodes).forEach(key => {
+                Object.keys(newCodes)
+                    .forEach(key => {
 
-                    if (
-                        !previousCodes[key] &&
-                        newCodes[key]
-                    ) {
+                        if (
+                            !previousCodes[key] &&
+                            newCodes[key]
+                        ) {
 
-                        showNewCodeNotification(
-                            newCodes[key].code ||
-                            "New Code"
-                        );
+                            showNewCodeNotification(
+                                newCodes[key].code ||
+                                "New Code"
+                            );
 
-                    }
+                        }
 
-                });
+                    });
 
             }
 
 
-            allCodes = newCodes;
-
-            previousCodes = newCodes;
-
-
-            displayCodes(allCodes);
+            allCodes =
+                newCodes;
 
 
-            document
-                .getElementById("lastUpdated")
-                .innerText =
+            previousCodes =
+                newCodes;
+
+
+            displayCodes(
+                allCodes
+            );
+
+
+            const lastUpdated =
+                document.getElementById(
+                    "lastUpdated"
+                );
+
+
+            if (lastUpdated) {
+
+                lastUpdated.innerText =
                     "🔄 Refreshed: " +
                     new Date()
                         .toLocaleTimeString();
+
+            }
 
         })
 
         .catch(error => {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
             alert(
                 "❌ Failed to refresh codes"
@@ -469,39 +686,57 @@ function loadCodes() {
 
 
 /* ================================
-   HTML নিরাপদ রাখা
+   HTML SECURITY
 ================================ */
 
 function escapeHTML(text) {
 
     return String(text)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
 
 
 /* ================================
-   LIVE LISTENER
+   START LIVE LISTENER
 ================================ */
 
 listenForCodes();
 
 
 /* ================================
-   প্রতি ১ সেকেন্ডে EXPIRY CHECK
+   EXPIRY TIMER
 ================================ */
 
 setInterval(() => {
 
-    displayCodes(allCodes);
+    displayCodes(
+        allCodes
+    );
 
 }, 1000);
 
@@ -517,7 +752,15 @@ function toggleTheme() {
 
 
     const isLight =
-        root.getAttribute("data-theme") === "light";
+        root.getAttribute(
+            "data-theme"
+        ) === "light";
+
+
+    const button =
+        document.getElementById(
+            "themeButton"
+        );
 
 
     if (isLight) {
@@ -527,15 +770,9 @@ function toggleTheme() {
         );
 
 
-        const button =
-            document.getElementById(
-                "themeButton"
-            );
-
-
         if (button) {
 
-            button.innerText =
+            button.textContent =
                 "☀️";
 
         }
@@ -546,9 +783,7 @@ function toggleTheme() {
             "dark"
         );
 
-    }
-
-    else {
+    } else {
 
         root.setAttribute(
             "data-theme",
@@ -556,15 +791,9 @@ function toggleTheme() {
         );
 
 
-        const button =
-            document.getElementById(
-                "themeButton"
-            );
-
-
         if (button) {
 
-            button.innerText =
+            button.textContent =
                 "🌙";
 
         }
@@ -607,7 +836,7 @@ function loadTheme() {
 
         if (button) {
 
-            button.innerText =
+            button.textContent =
                 "🌙";
 
         }
@@ -631,19 +860,23 @@ function showNewCodeNotification(code) {
             "notification"
         );
 
-
     const codeText =
         document.getElementById(
             "notificationCode"
         );
 
 
-    if (!notification || !codeText) {
+    if (
+        !notification ||
+        !codeText
+    ) {
+
         return;
+
     }
 
 
-    codeText.innerText =
+    codeText.textContent =
         code;
 
 
